@@ -35,3 +35,61 @@ resource "aws_iam_instance_profile" "ec2" {
   name = "${var.project_name}-${var.environment}-ec2-instance-profile"
   role = aws_iam_role.ec2.name
 }
+
+resource "aws_launch_template" "app" {
+  name_prefix   = "${var.project_name}-${var.environment}-app-"
+  image_id      = var.ami_id
+  instance_type = var.ec2_instance_type
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2.name
+  }
+
+  vpc_security_group_ids = [var.app_security_group_id]
+
+  user_data = base64encode(file("${path.module}/user_data.sh"))
+
+  tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name        = "${var.project_name}-${var.environment}-app-instance"
+      Project     = var.project_name
+      Environment = var.environment
+    }
+  }
+}
+
+resource "aws_autoscaling_group" "app" {
+  name                = "${var.project_name}-${var.environment}-app-asg"
+  min_size            = var.asg_min_size
+  desired_capacity    = var.asg_desired_size
+  max_size            = var.asg_max_size
+  vpc_zone_identifier = var.private_subnet_ids
+
+  launch_template {
+    id      = aws_launch_template.app.id
+    version = "$Latest"
+  }
+
+  health_check_type         = "EC2"
+  health_check_grace_period = 300
+
+  tag {
+    key                 = "Name"
+    value               = "${var.project_name}-${var.environment}-app-instance"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "Project"
+    value               = var.project_name
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "Environment"
+    value               = var.environment
+    propagate_at_launch = true
+  }
+}

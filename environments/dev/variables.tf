@@ -47,3 +47,7 @@ variable "asg_desired_size" {
 variable "asg_max_size" {
   type = number
 }
+
+variable "ami_id" {
+  type = string
+}

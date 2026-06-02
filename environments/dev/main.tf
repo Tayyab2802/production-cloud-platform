@@ -38,4 +38,6 @@ module "compute" {
   asg_min_size      = var.asg_min_size
   asg_desired_size  = var.asg_desired_size
   asg_max_size      = var.asg_max_size
+  ami_id            = var.ami_id
+
 }
