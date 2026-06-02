@@ -9,3 +9,19 @@ module "networking" {
   availability_zones   = var.availability_zones
   nat_gateway_count    = var.nat_gateway_count
 }
+
+module "security" {
+  source = "../../modules/security"
+
+  project_name = var.project_name
+  environment  = var.environment
+  vpc_id       = module.networking.vpc_id
+  app_port     = 8000
+}
+
+module "ecr" {
+  source = "../../modules/ecr"
+
+  project_name = var.project_name
+  environment  = var.environment
+}
