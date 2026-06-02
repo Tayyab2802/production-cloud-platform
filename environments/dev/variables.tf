@@ -31,3 +31,19 @@ variable "nat_gateway_count" {
   description = "Number of NAT Gateways for this environment"
   type        = number
 }
+
+variable "ec2_instance_type" {
+  type = string
+}
+
+variable "asg_min_size" {
+  type = number
+}
+
+variable "asg_desired_size" {
+  type = number
+}
+
+variable "asg_max_size" {
+  type = number
+}

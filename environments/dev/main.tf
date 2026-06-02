@@ -25,3 +25,17 @@ module "ecr" {
   project_name = var.project_name
   environment  = var.environment
 }
+
+module "compute" {
+  source = "../../modules/compute"
+
+  project_name          = var.project_name
+  environment           = var.environment
+  private_subnet_ids    = module.networking.private_subnet_ids
+  app_security_group_id = module.security.app_security_group_id
+
+  ec2_instance_type = var.ec2_instance_type
+  asg_min_size      = var.asg_min_size
+  asg_desired_size  = var.asg_desired_size
+  asg_max_size      = var.asg_max_size
+}
