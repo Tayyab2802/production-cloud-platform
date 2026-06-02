@@ -41,3 +41,15 @@ module "compute" {
   ami_id            = var.ami_id
 
 }
+
+module "alb" {
+  source = "../../modules/alb"
+
+  project_name           = var.project_name
+  environment            = var.environment
+  vpc_id                 = module.networking.vpc_id
+  public_subnet_ids      = module.networking.public_subnet_ids
+  alb_security_group_id  = module.security.alb_security_group_id
+  autoscaling_group_name = module.compute.autoscaling_group_name
+  app_port               = 8000
+}

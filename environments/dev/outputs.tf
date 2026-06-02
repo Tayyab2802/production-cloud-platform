@@ -42,3 +42,11 @@ output "launch_template_id" {
 output "autoscaling_group_name" {
   value = module.compute.autoscaling_group_name
 }
+
+output "alb_dns_name" {
+  value = module.alb.alb_dns_name
+}
+
+output "target_group_arn" {
+  value = module.alb.target_group_arn
+}
