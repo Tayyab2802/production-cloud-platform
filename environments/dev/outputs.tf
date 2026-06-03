@@ -62,3 +62,7 @@ output "frontend_bucket_regional_domain_name" {
 output "cloudfront_domain_name" {
   value = aws_cloudfront_distribution.frontend.domain_name
 }
+
+output "cloudfront_waf_arn" {
+  value = module.waf.web_acl_arn
+}

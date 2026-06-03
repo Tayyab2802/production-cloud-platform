@@ -53,3 +53,14 @@ module "alb" {
   autoscaling_group_name = module.compute.autoscaling_group_name
   app_port               = 8000
 }
+
+module "waf" {
+  source = "../../modules/waf"
+
+  providers = {
+    aws = aws.use1
+  }
+
+  project_name = var.project_name
+  environment  = var.environment
+}
