@@ -46,6 +46,8 @@ module "compute" {
   db_username = var.db_username
   db_password = var.db_password
 
+  container_image = var.container_image
+
 }
 
 module "alb" {
@@ -82,4 +84,14 @@ module "waf" {
 
   project_name = var.project_name
   environment  = var.environment
+}
+
+module "github_oidc" {
+  source = "../../modules/github_oidc"
+
+  project_name  = var.project_name
+  environment   = var.environment
+  github_org    = "Tayyab2802"
+  github_repo   = "production-cloud-platform"
+  github_branch = "dev"
 }

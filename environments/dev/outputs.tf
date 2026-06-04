@@ -79,3 +79,7 @@ output "rds_port" {
 output "rds_database_name" {
   value = module.rds.db_name
 }
+
+output "github_actions_role_arn" {
+  value = module.github_oidc.github_actions_role_arn
+}
