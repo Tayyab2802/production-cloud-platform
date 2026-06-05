@@ -69,6 +69,8 @@ module "rds" {
   environment           = var.environment
   private_subnet_ids    = module.networking.private_subnet_ids
   rds_security_group_id = module.security.rds_security_group_id
+  multi_az              = var.db_multi_az
+  deletion_protection   = var.db_deletion_protection
 
   db_name     = "bankingapp"
   db_username = var.db_username

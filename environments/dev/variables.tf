@@ -62,3 +62,15 @@ variable "db_password" {
   type        = string
   sensitive   = true
 }
+
+variable "db_multi_az" {
+  description = "Whether to enable Multi-AZ for the RDS instance"
+  type        = bool
+  default     = false
+}
+
+variable "db_deletion_protection" {
+  description = "Whether deletion protection is enabled for the RDS instance"
+  type        = bool
+  default     = false
+}

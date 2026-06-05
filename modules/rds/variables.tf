@@ -37,3 +37,15 @@ variable "allocated_storage" {
   type    = number
   default = 20
 }
+
+variable "multi_az" {
+  description = "Whether the RDS instance should use Multi-AZ deployment"
+  type        = bool
+  default     = false
+}
+
+variable "deletion_protection" {
+  description = "Whether deletion protection is enabled for the RDS instance"
+  type        = bool
+  default     = false
+}
