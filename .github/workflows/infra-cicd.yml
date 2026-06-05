@@ -1,0 +1,72 @@
+name: Infra CI/CD
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - "environments/dev/**"
+      - "modules/**"
+      - ".github/workflows/infra-cicd.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: eu-west-2
+  ROLE_TO_ASSUME: arn:aws:iam::536376965240:role/production-cloud-platform-dev-github-actions-role
+
+jobs:
+  terraform-dev:
+    name: Terraform Dev Deploy
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: environments/dev
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ env.ROLE_TO_ASSUME }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform fmt check
+        run: terraform fmt -check -recursive ../..
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+      # TODO:
+      # Re-enable Checkov after project-specific suppressions
+      # and policy configuration are finalised.
+      #
+      # - name: Install Checkov
+      #   run: |
+      #     pip install checkov
+      #
+      # - name: Run Checkov
+      #   run: |
+      #     checkov -d . --framework terraform
+
+      - name: Terraform plan
+        run: |
+          terraform plan -input=false \
+            -var="db_password=${{ secrets.DEV_DB_PASSWORD }}"
+
+      - name: Terraform apply
+        run: |
+          terraform apply -auto-approve -input=false \
+            -var="db_password=${{ secrets.DEV_DB_PASSWORD }}"
