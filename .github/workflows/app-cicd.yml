@@ -77,8 +77,29 @@ jobs:
             --auto-scaling-group-name "${{ env.ASG_NAME }}" \
             --preferences '{"MinHealthyPercentage":50,"InstanceWarmup":120}'
 
-      - name: Wait for deployment
-        run: sleep 240
+      - name: Wait for ASG instance refresh
+        run: |
+          while true; do
+            STATUS=$(aws autoscaling describe-instance-refreshes \
+              --auto-scaling-group-name "${{ env.ASG_NAME }}" \
+              --query "InstanceRefreshes[0].Status" \
+              --output text)
+
+            echo "Instance refresh status: $STATUS"
+
+            if [ "$STATUS" = "Successful" ]; then
+              echo "Instance refresh completed successfully"
+              break
+            fi
+      
+
+            if [ "$STATUS" = "Failed" ] || [ "$STATUS" = "Cancelled" ]; then
+              echo "Instance refresh failed or was cancelled"
+              exit 1
+            fi
+
+            sleep 30
+          done
 
       - name: Smoke test application
         run: |
