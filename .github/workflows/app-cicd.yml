@@ -6,7 +6,7 @@ on:
       - dev
     paths:
       - "app/backend/**"
-      - ".github/workflows/app-cicd.yml"
+      
 
 permissions:
   id-token: write
