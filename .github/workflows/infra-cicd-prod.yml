@@ -1,0 +1,61 @@
+name: Prod Infra CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "environments/prod/**"
+      - "modules/**"
+      - ".github/workflows/infra-cicd-prod.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: eu-west-2
+  ROLE_TO_ASSUME: arn:aws:iam::536376965240:role/production-cloud-platform-prod-github-actions-role
+
+jobs:
+  terraform-prod:
+    name: Terraform Prod Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    defaults:
+      run:
+        working-directory: environments/prod
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ env.ROLE_TO_ASSUME }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform fmt check
+        run: terraform fmt -check -recursive ../..
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: |
+          terraform plan -lock-timeout=5m -input=false \
+            -var="db_password=${{ secrets.PROD_DB_PASSWORD }}"
+
+      - name: Terraform apply
+        run: |
+          terraform apply -lock-timeout=5m -auto-approve -input=false \
+            -var="db_password=${{ secrets.PROD_DB_PASSWORD }}"
